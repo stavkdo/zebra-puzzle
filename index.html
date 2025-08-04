@@ -7,8 +7,9 @@
   background: url('greenBotton.svg') no-repeat center center;
   background-size: contain;
   border: none;
-  width: 115px;
-  height: 38px;
+  width: 7.2vw;
+  max-width: 200px;
+  aspect-ratio: 3 / 1;
   cursor: pointer;
 
   position: absolute;
@@ -34,14 +35,19 @@
 }
 
 @media (max-width: 700px) {
-      .game-grid {
-        gap: 8px;
-      }
-      .game-col {
-        gap: 4px;
-      }
-      .game-card { padding: 4px 0.5vw 4px 0.5vw; max-width: 99vw; }
+    .game-card {
+    width: 100vw;
+    height: 100vh;
+    background-size: contain;
+  }
+
+  .svg-background-btn {
+    width: 26vw;        
+    top: 53.8%;
+    left: 80.28%;
+  }
     }
+
  </style>
 <head>
   <meta charset="UTF-8" />
