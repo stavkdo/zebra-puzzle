@@ -13,7 +13,7 @@
 ### 🌐 Live Demo
 
 You can try the riddle here:  
-<img src="blue.svg" alt="Character 1" width="20"/> [**GitHub Pages**](https://zebra-puzzle-ryvy.vercel.app/)
+<img src="blue.svg" alt="Character 1" width="30"/> [**GitHub Pages**](https://zebra-puzzle-ryvy.vercel.app/)
 
 ---
 
@@ -24,7 +24,7 @@ You can try the riddle here:
 - ✅ JavaScript
 - 🎨 SVG illustration (custom-made!)
 
-No frameworks, no libraries — just clean, responsive, semantic code. <img src="pink.svg" alt="Character 1" width="20"/>
+No frameworks, no libraries — just clean, responsive, semantic code. <img src="pink.svg" alt="Character 1" width="30"/>
 
 ---
 ### <img src="white.svg" alt="Character 1" width="20"/> Author
