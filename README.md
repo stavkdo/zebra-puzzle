@@ -1,7 +1,7 @@
 
   
 
-<h1 align="center"> <img src="favicon.svg" alt="Einstein Riddle Logo" width="50"/> Zebra a ~~Linkedin~~ Web Puzzle</h1>
+<h1 align="center"> <img src="favicon.svg" alt="Einstein Riddle Logo" width="50"/> Zebra a ~Linkedin~ Web Puzzle</h1>
 
 <p align="center">
   An HTML/CSS/JS implementation of the famous Einstein's Riddle, a logic-based brain challenge!
@@ -12,7 +12,7 @@
 ### 🌐 Live Demo
 
 You can try the riddle here:  
-<img src="blue.svg" alt="Character 1" width="30"/> [**GitHub Pages**](https://zebra-puzzle-ryvy.vercel.app/)
+<img src="blue.svg" alt="Character 1" width="30"/> [**PLAY HERE**](https://zebra-puzzle-ryvy.vercel.app/)
 
 ---
 
