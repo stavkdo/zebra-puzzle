@@ -1,8 +1,7 @@
-<p align="center">
-  <img src="favicon.svg" alt="Einstein Riddle Logo" width="200"/>
-</p>
 
-<h1 align="center"> Zebra — Web Puzzle</h1>
+  
+
+<h1 align="center"> <img src="favicon.svg" alt="Einstein Riddle Logo" width="50"/> Zebra a ~~Linkedin~~ Web Puzzle</h1>
 
 <p align="center">
   An HTML/CSS/JS implementation of the famous Einstein's Riddle, a logic-based brain challenge!
