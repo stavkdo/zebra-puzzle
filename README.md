@@ -24,7 +24,7 @@ You can try the riddle here:
 - ✅ JavaScript
 - 🎨 SVG illustration (custom-made!)
 
-No frameworks, no libraries — just clean, responsive, semantic code. <img src="pink.svg" alt="Character 1" width="30"/>
+No frameworks, no libraries — just clean, responsive code. <img src="pink.svg" alt="Character 1" width="30"/>
 
 ---
 ### <img src="white.svg" alt="Character 1" width="20"/> Author
