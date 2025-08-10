@@ -6,32 +6,43 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', 'Montserrat', system-ui, sans-serif;
-    background: #f6f8fa;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    :root {
+      /* Responsive sizing knobs (tweak if you want things larger/smaller) */
+      --gap: clamp(8px, 2.5vw, 24px);
+      --box: clamp(44px, 12vw, 60px);        /* drop-box & house size */
+      --charW: clamp(30px, 8.5vw, 48px);     /* character width */
+      --charH: calc(var(--charW) * (62/48)); /* keep original char ratio */
+      --animal: clamp(22px, 6vw, 36px);      /* animal size */
     }
+
+    /* Page container */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Montserrat', system-ui, sans-serif;
+      background: #f6f8fa;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden; /* NO page scroll */
+    }
+
+    /* Card */
     .game-card {
       background: #fff;
       border-radius: 16px;
       border: 1.5px solid #e0e0e0;
-      box-shadow: none;
       padding: 18px 8px 12px 8px;
-      max-width: 420px;
-      width: 98vw;
-      height: 98vh;
-      margin: 4px 0;
+      width: min(98vw, 860px);
+      height: 98vh;                /* fits the screen with tiny breathing room */
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-sizing: border-box;
     }
+
     .game-header-bar {
       width: 100%;
       display: flex;
@@ -50,47 +61,38 @@
       text-align: center;
       letter-spacing: 0.5px;
       border: 1px solid #e0e0e0;
-      box-shadow: none;
-      display: inline-block;
     }
     .error-badge {
       color: #e53935;
       background: #fbe9e7;
       border: 1px solid #ffcdd2;
     }
+
     .header {
       font-size: 1.1rem;
       font-weight: 700;
       letter-spacing: 0.5px;
-      margin-bottom: 0;
-      margin-top: 0;
+      margin: 0;
       color: #222;
-      text-shadow: none;
     }
     .subheader {
       font-size: 0.92rem;
       margin: 0;
       color: #666;
       font-weight: 600;
-      margin-bottom: 0;
     }
+
     .message {
       font-weight: bold;
-      font-size: 1.0rem;
-      margin: 2px 0 2px 0;
+      font-size: 1rem;
+      margin: 2px 0;
       color: #1976d2;
       min-height: 32px;
-      transition: color 0.3s;
       text-align: center;
     }
-    .message.error {
-      color: #e53935;
-      animation: shake 0.3s;
-    }
-    .message.success {
-      color: #43a047;
-      animation: pop 0.4s;
-    }
+    .message.error { color: #e53935; animation: shake 0.3s; }
+    .message.success { color: #43a047; animation: pop 0.4s; }
+
     @keyframes shake {
       0% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
@@ -103,389 +105,123 @@
       50% { transform: scale(1.15); }
       100% { transform: scale(1); }
     }
-    .game-stats {
-      display: flex;
-      gap: 16px;
-      font-size: 1rem;
-      margin-bottom: 10px;
-      color: #333;
-      font-weight: 600;
+
+    /* GRID — always 4 columns */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: var(--gap);
+      justify-items: center;
+      align-items: end;
+      margin: 0;
     }
-    .game-stats span {
-      background: #f0f2f5;
-      border-radius: 12px;
-      padding: 4px 14px;
-      margin: 0 0;
-      min-width: 60px;
-      display: inline-block;
-      text-align: center;
-      box-shadow: none;
-    }
-    .houses, .characters, .animals {
-      width: 100%;
+    .game-col {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
-      margin-top: 18px;
-      z-index: 2;
-      position: relative;
+      gap: 12px;
     }
+
+    /* Drop targets */
     .drop-box {
-      width: 60px;
-      height: 60px;
+      width: var(--box);
+      height: var(--box);
       border: 2.5px solid #e0e0e0;
-      border-radius: 20px;
+      border-radius: calc(var(--box) * 0.33);
       background: #f6f8fa;
-      box-shadow: 0 1px 4px #e3e3e3;
       position: relative;
       overflow: hidden;
       margin-bottom: 30px;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .drop-box.active {
-      border-color: #ff9800;
-      background: #fff3e0;
-    }
-    .house, .character-svg, .animal {
-      transition: transform 0.18s;
-      border-radius: 18px;
-    }
-    .house:hover, .character-svg:hover, .animal:hover {
-      transform: scale(1.08) translateY(-2px);
-      box-shadow: 0 4px 16px #ffd18044;
-      z-index: 10;
-    }
-    .character-svg.bounce {
-      animation: bounce 0.4s;
-    }
-    @keyframes bounce {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
-    }
-    .character-svg.glow .head,
-    .character-svg.glow .body {
-      filter: drop-shadow(0 0 10px #ff9800);
-    }
+    .drop-box.active { border-color: #ff9800; background: #fff3e0; }
+
+    /* House / Character / Animal sizes follow variables */
+    .house,
+    .house img,
+    .house svg { width: var(--box) !important; height: var(--box) !important; object-fit: contain; display:block; }
+
+    .character-svg,
+    .character-svg img,
+    .character-svg svg { width: var(--charW) !important; height: var(--charH) !important; object-fit: contain; display:block; }
+
+    .animal,
+    .animal img,
+    .animal svg { width: var(--animal) !important; height: var(--animal) !important; object-fit: contain; display:block; }
+
+    .house, .character-svg, .animal { transition: transform 0.18s; border-radius: 18px; }
+    .house:hover, .character-svg:hover, .animal:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 4px 16px #ffd18044; z-index: 10; }
+    .character-svg.bounce { animation: bounce 0.4s; }
+    @keyframes bounce { 0%{transform:translateY(0)} 50%{transform:translateY(-10px)} 100%{transform:translateY(0)} }
+    .character-svg.glow .head, .character-svg.glow .body { filter: drop-shadow(0 0 10px #ff9800); }
+
+    .game-stats { display: flex; gap: 16px; font-size: 1rem; margin-bottom: 10px; color: #333; font-weight: 600; }
+    .game-stats span { background: #f0f2f5; border-radius: 12px; padding: 4px 14px; min-width: 60px; text-align: center; }
+
     .clue-box {
       background: #f0f2f5;
-      padding-left: 10px;
-      padding-right: 0;
-      padding-top: 0;
-      padding-bottom: 0;
+      padding: 0 10px;
       width: 100%;
       max-width: 420px;
       border-radius: 18px;
       font-size: 0.75rem;
       margin: 4px 0 0 0;
-      min-height: 0;
       box-sizing: border-box;
-      box-shadow: none;
       color: #333;
       word-break: break-word;
     }
-    .answer-row {
-      margin: 16px 0 0 0;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-    }
-    #answerInput {
-      font-size: 1.1rem;
-      padding: 8px 16px;
-      border-radius: 12px;
-      border: 2px solid #e0e0e0;
-      outline: none;
-      transition: border-color 0.2s;
-      min-width: 140px;
-      background: #fff;
-      color: #222;
-    }
-    #answerInput:focus {
-      border-color: #ff9800;
-    }
+
+    .answer-row { margin: 16px 0 0 0; display: flex; gap: 10px; align-items: center; justify-content: center; }
+    #answerInput { font-size: 1.1rem; padding: 8px 16px; border-radius: 12px; border: 2px solid #e0e0e0; outline: none; min-width: 140px; background:#fff; color:#222; }
+    #answerInput:focus { border-color: #ff9800; }
     #submitBtn, #resetBtn {
-      font-size: 1.1rem;
-      padding: 8px 20px;
-      border-radius: 12px;
-      border: none;
-      background: #ff9800;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 1px 4px #ffd18044;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      font-size: 1.1rem; padding: 8px 20px; border-radius: 12px; border: none;
+      background: #ff9800; color: #fff; font-weight: 700; cursor: pointer;
+      box-shadow: 0 1px 4px #ffd18044; transition: background 0.2s, transform 0.15s;
     }
-    #submitBtn:disabled, #resetBtn:disabled {
-      background: #e0e0e0;
-      color: #aaa;
-      cursor: not-allowed;
-    }
-    #submitBtn:hover:not(:disabled), #resetBtn:hover:not(:disabled) {
-      background: #fb8c00;
-      transform: scale(1.05);
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(44, 62, 80, 0.10);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      animation: fadeIn 0.3s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    #submitBtn:disabled, #resetBtn:disabled { background:#e0e0e0; color:#aaa; cursor:not-allowed; }
+    #submitBtn:hover:not(:disabled), #resetBtn:hover:not(:disabled) { background:#fb8c00; transform:scale(1.05); }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; background: rgba(44, 62, 80, 0.10);
+      display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     .modal-content {
-      background: #fff;
-      border-radius: 28px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
-      padding: 32px 18px;
-      text-align: center;
-      font-size: 1.05rem;
-      color: #222;
-      min-width: 220px;
-      max-width: 90vw;
-      animation: pop 0.4s;
+      background:#fff; border-radius:28px; box-shadow:0 8px 32px rgba(31,38,135,0.1);
+      padding:32px 18px; text-align:center; font-size:1.05rem; color:#222;
+      min-width:220px; max-width:90vw; animation: pop 0.4s;
     }
-    .modal-content button {
-      margin-top: 18px;
-    }
-    .house {
-      width: 56px !important;
-      height: 56px !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      
-    }
-    .house img, .house svg {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-    .house svg {
-      width: 56px !important;
-      height: 56px !important;
-    }
-    .character-svg {
-      width: 48px !important;
-      height: 62px !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .character-svg img {
-      width: 48px !important;
-      height: 62px !important;
-      object-fit: contain;
-      display: block;
-    }
-    .character-svg svg {
-      width: 48px !important;
-      height: 62px !important;
-    }
-    .animal {
-      width: 36px !important;
-      height: 36px !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .animal img {
-      width: 36px !important;
-      height: 36px !important;
-      object-fit: contain;
-      display: block;
-    }
-    .animal svg {
-      width: 36px !important;
-      height: 36px !important;
-    }
-    .house img, .house svg, .character-svg img, .character-svg svg, .animal img, .animal svg {
-      background: none !important;
-    }
-    .game-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      justify-items: center;
-      align-items: end;
-      margin: 0;
-      margin-top: 0;
-    }
-    .game-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .character-select-row {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin: 4px 0 0 0;
-    }
+    .modal-content button { margin-top:18px; }
+
+    /* Character choice buttons */
+    .character-select-row { display: flex; justify-content: center; gap: 16px; margin: 4px 0 0 0; flex-wrap: wrap; }
     .character-select {
-      font-size: 1.1rem;
-      padding: 8px 18px;
-      border-radius: 12px;
-      border: none;
-      background: #f0f2f5;
-      color: #060606;
-      font-weight: 700;
-      cursor: pointer;
+      font-size: 1.1rem; padding: 8px 18px; border-radius:12px; border:none;
+      background:#f0f2f5; color:#060606; font-weight:700; cursor:pointer;
       transition: background 0.2s, color 0.2s, transform 0.15s;
     }
-    .character-select:active {
-      background: #ff9800;
-      color: #fff;
-      transform: scale(0.97);
-    }
-    .character-select[disabled] {
-      background: #e0e0e0;
-      color: #aaa;
-      cursor: not-allowed;
-    }
-    .select-blue   { background: #e3f2fd; color: #1976d2; }
-    .select-purple { background: #ede7f6; color: #ca8bfe; }
-    .select-pink   { background: #fce4ec; color: #eb6ed0; }
-    .select-white  { background: #f5f5f5; color: #222; }
-    .character-svg.white img, .character-svg.white svg {
-      width: 85% !important;
-      height: 85% !important;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-    }
+    .character-select:active { background:#ff9800; color:#fff; transform:scale(0.97); }
+    .character-select[disabled] { background:#e0e0e0; color:#aaa; cursor:not-allowed; }
+    .select-blue{ background:#e3f2fd; color:#1976d2;}
+    .select-purple{ background:#ede7f6; color:#ca8bfe;}
+    .select-pink{ background:#fce4ec; color:#eb6ed0;}
+    .select-white{ background:#f5f5f5; color:#222;}
+    .character-svg.white img, .character-svg.white svg { width:85% !important; height:85% !important; margin:0 auto; display:block; }
+
+    /* Keep your mobile typography tweaks, but DO NOT change columns */
     @media (max-width: 700px) {
-    body {
-      padding: 0 4vw;
-      justify-content: flex-start;
+      .header { font-size: 1.25rem; text-align: center; }
+      .subheader { font-size: 1rem; margin-top: 10px; }
+      .timer-badge, .error-badge { font-size: 0.85rem; padding: 4px 8px; min-width: 40px; }
+      .clue-box { padding: 10px 4vw; font-size: 0.9rem; }
+      .answer-row { flex-direction: column; gap: 8px; margin-top: 16px; }
+      #answerInput, #submitBtn, #resetBtn { font-size: 1rem; padding: 8px 12px; width: 100%; max-width: 300px; }
+      .modal-content { font-size: 1rem; padding: 20px 10px; }
+      .character-select { font-size: 1rem; padding: 6px 14px; }
     }
-
-    .game-card {
-      width: 100vw;
-      height: auto;
-      padding: 8px 2vw;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .game-header-bar {
-      margin-bottom: 6px;
-    }
-
-    .header {
-      font-size: 1.25rem;
-      text-align: center;
-    }
-
-    .subheader {
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-
-    .timer-badge,
-    .error-badge {
-      font-size: 0.85rem;
-      padding: 4px 8px;
-      min-width: 40px;
-    }
-
-    .clue-box {
-      padding: 10px 4vw;
-      font-size: 0.9rem;
-    }
-
-    .game-grid {
-      gap: 12px;
-      grid-template-columns: repeat(2, 1fr);
-      margin-top: 16px;
-    }
-
-    .game-col {
-      gap: 8px;
-    }
-
-    .drop-box {
-      width: 56px;
-      height: 56px;
-      margin-bottom: 16px;
-    }
-
-    .house,
-    .house img,
-    .house svg {
-      width: 44px !important;
-      height: 44px !important;
-    }
-
-    .character-svg,
-    .character-svg img,
-    .character-svg svg {
-      width: 38px !important;
-      height: 50px !important;
-    }
-
-    .animal,
-    .animal img,
-    .animal svg {
-      width: 28px !important;
-      height: 28px !important;
-    }
-
-    .answer-row {
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    #answerInput,
-    #submitBtn,
-    #resetBtn {
-      font-size: 1rem;
-      padding: 8px 12px;
-      width: 100%;
-      max-width: 300px;
-    }
-
-    .modal-content {
-      font-size: 1rem;
-      padding: 20px 10px;
-    }
-
-    .character-select-row {
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .character-select {
-      font-size: 1rem;
-      padding: 6px 14px;
-    }
-  }
-
   </style>
 </head>
 <body>
@@ -494,9 +230,10 @@
       <span class="timer-badge" id="timer">00:00</span>
       <span class="error-badge">Errors: <span id="errorCount">0</span> / 3</span>
     </div>
+
     <div class="header">Find the Zebra</div>
-   
     <div class="message" id="messageBox"></div>
+
     <div class="game-grid">
       <div class="game-col">
         <div class="house" draggable="true" data-name="red"><img src="redHouse.svg" alt="Red House" /></div>
@@ -523,6 +260,7 @@
         <div class="drop-box" data-index="3"></div>
       </div>
     </div>
+
     <div class="subheader">Who has the zebra?</div>
     <div class="character-select-row">
       <button class="character-select select-blue" data-name="blue">Blue</button>
@@ -530,6 +268,7 @@
       <button class="character-select select-pink" data-name="pink">Pink</button>
       <button class="character-select select-white" data-name="white">White</button>
     </div>
+
     <div class="clue-box" id="clueBox">
       <p><strong>Clue 1:</strong> The pink character lives in the leftmost house.</p>
       <p><strong>Clue 2:</strong> The horse lives in the green house.</p>
@@ -541,11 +280,14 @@
       <p><strong>Clue 8:</strong> The mouse is in the leftmost house.</p>
     </div>
   </div>
-  <div id="modal" class="modal" style="display:none;">
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
     <div class="modal-content" id="modalContent"></div>
   </div>
+
   <script>
-    // Timer logic
+    // Timer & game state
     let timerInterval, seconds = 0, errors = 0, guesses = 0, maxGuesses = 3;
     const timerEl = document.getElementById('timer');
     const errorEl = document.getElementById('errorCount');
@@ -561,20 +303,23 @@
         timerEl.textContent = `${min}:${sec}`;
       }, 1000);
     }
-    function stopTimer() {
-      clearInterval(timerInterval);
+    function stopTimer() { clearInterval(timerInterval); }
+    function showModal(msg) {
+      modalContent.innerHTML = msg + `<br><button onclick='resetGame()' id='modalResetBtn'>Play Again</button>`;
+      modal.style.display = 'flex';
+      setTimeout(() => { document.getElementById('modalResetBtn').focus(); }, 100);
     }
+    function hideModal() { modal.style.display = 'none'; }
+
     function resetGame() {
       stopTimer();
-      seconds = 0;
-      errors = 0;
-      guesses = 0;
+      seconds = 0; errors = 0; guesses = 0;
       timerEl.textContent = '00:00';
       errorEl.textContent = '0';
       messageBox.textContent = '';
       messageBox.className = 'message';
       document.querySelectorAll('.character-select').forEach(b => b.disabled = false);
-      // Remove all drop-box contents
+      // clear drop boxes
       document.querySelectorAll('.drop-box').forEach(box => {
         box.innerHTML = '';
         box.style.background = '#f6f8fa';
@@ -582,18 +327,10 @@
       hideModal();
       startTimer();
     }
-    function showModal(msg, isSuccess) {
-      modalContent.innerHTML = msg + `<br><button onclick='resetGame()' id='modalResetBtn'>Play Again</button>`;
-      modal.style.display = 'flex';
-      setTimeout(() => {
-        document.getElementById('modalResetBtn').focus();
-      }, 100);
-    }
-    function hideModal() {
-      modal.style.display = 'none';
-    }
+
     startTimer();
 
+    // Character selection buttons
     document.querySelectorAll('.character-select').forEach(btn => {
       btn.onclick = function() {
         if (guesses >= maxGuesses) return;
@@ -604,7 +341,7 @@
           messageBox.textContent = `✔ Correct! You found the zebra owner in ${timerEl.textContent}`;
           messageBox.className = 'message success';
           document.querySelectorAll('.character-select').forEach(b => b.disabled = true);
-          showModal(`<b>🎉 Congratulations!</b><br>You found the zebra owner in <b>${timerEl.textContent}</b>!`, true);
+          showModal(`<b>🎉 Congratulations!</b><br>You found the zebra owner in <b>${timerEl.textContent}</b>!`);
         } else {
           errors++;
           errorEl.textContent = errors;
@@ -614,69 +351,55 @@
             messageBox.textContent = "❌ No more guesses! Game over.";
             document.querySelectorAll('.character-select').forEach(b => b.disabled = true);
             stopTimer();
-            showModal(`<b>Game Over</b><br>No more guesses!<br>The correct answer was <b>blue</b>.`, false);
+            showModal(`<b>Game Over</b><br>No more guesses!<br>The correct answer was <b>blue</b>.`);
           }
         }
       };
     });
 
-    // Helper to lighten a hex color
+    // Lighten color helper
     function lightenColor(hex, percent) {
       hex = hex.replace(/^#/, '');
-      if (hex.length === 3) {
-        hex = hex.split('').map(x => x + x).join('');
-      }
+      if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
       let num = parseInt(hex, 16);
-      let r = (num >> 16) & 0xFF;
-      let g = (num >> 8) & 0xFF;
-      let b = num & 0xFF;
-      // Interpolate each channel toward 255 (white)
+      let r = (num >> 16) & 0xFF, g = (num >> 8) & 0xFF, b = num & 0xFF;
       r = Math.round(r + (255 - r) * percent);
       g = Math.round(g + (255 - g) * percent);
       b = Math.round(b + (255 - b) * percent);
       return `rgb(${r},${g},${b})`;
     }
 
-    // Set drop box background based on house (lighter shade)
+    // Update drop box background from house color
     function updateDropBoxBackground(box) {
       const houseWrapper = box.querySelector('[data-category="house"]');
       if (houseWrapper) {
-        // Try to find SVG color (legacy)
         let svg = houseWrapper.querySelector('svg');
         let color = svg?.querySelector('polygon')?.getAttribute('fill') || svg?.querySelector('rect')?.getAttribute('fill');
-        // If not SVG, try to detect from <img src>
         if (!color) {
           let img = houseWrapper.querySelector('img');
           if (img && img.src) {
-            // Extract color from filename (e.g., redHouse.svg)
             let match = img.src.match(/([a-zA-Z]+)House\.svg$/);
             if (match) {
               const colorName = match[1].toLowerCase();
-              const colorMap = {
-                red: '#f44336',
-                orange: '#ff9800',
-                yellow: '#ffeb3b',
-                green: '#8bc34a',
-              };
+              const colorMap = { red: '#f44336', orange: '#ff9800', yellow: '#ffeb3b', green: '#8bc34a' };
               color = colorMap[colorName];
             }
           }
         }
-        if (color) {
-          box.style.background = lightenColor(color, 0.45);
-          return;
-        }
+        if (color) { box.style.background = lightenColor(color, 0.45); return; }
       }
       box.style.background = '#f6f8fa';
     }
 
-    // Drag & drop logic for 4 drop boxes, only one from each category per box
+    // Category helper
     function getCategory(el) {
       if (el.classList.contains('house')) return 'house';
       if (el.classList.contains('character-svg')) return 'character';
       if (el.classList.contains('animal')) return 'animal';
       return '';
     }
+
+    // Enable drag for source items
     document.querySelectorAll('.house, .character-svg, .animal').forEach(el => {
       el.addEventListener('dragstart', function(e) {
         e.dataTransfer.setData('name', el.dataset.name || '');
@@ -684,134 +407,104 @@
         e.dataTransfer.setData('html', el.outerHTML);
       });
     });
+
+    // Drop zones
     document.querySelectorAll('.drop-box').forEach(box => {
-      box.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        box.classList.add('active');
-      });
-      box.addEventListener('dragleave', function(e) {
-        box.classList.remove('active');
-        updateDropBoxBackground(box);
-      });
-      box.addEventListener('drop', function(e) {
+      box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('active'); });
+      box.addEventListener('dragleave', e => { box.classList.remove('active'); updateDropBoxBackground(box); });
+      box.addEventListener('drop', e => {
         e.preventDefault();
         box.classList.remove('active');
         let category = e.dataTransfer.getData('category');
-        // Remove previous of same category (allow switch)
+
+        // Remove previous of same category
         let prev = box.querySelector(`[data-category="${category}"]`);
         if (prev) prev.remove();
-        // Create a wrapper for positioning
+
+        // Wrapper to allow positioning
         let wrapper = document.createElement('div');
         wrapper.dataset.category = category;
         wrapper.style.position = "absolute";
         wrapper.style.margin = "0";
-        wrapper.style.pointerEvents = "auto"; // Allow dragging out
+        wrapper.style.pointerEvents = "auto";
         wrapper.innerHTML = e.dataTransfer.getData('html');
+
         let dropped = wrapper.firstChild;
         dropped.setAttribute('draggable', 'true');
-        // Position and size by category
+
         if (category === "house") {
-          wrapper.style.left = "0";
-          wrapper.style.top = "0";
-          wrapper.style.width = "100%";
-          wrapper.style.height = "100%";
+          // Fill the box
+          wrapper.style.left = "0"; wrapper.style.top = "0";
+          wrapper.style.width = "100%"; wrapper.style.height = "100%";
           wrapper.style.zIndex = "1";
-          wrapper.style.margin = "0";
-          wrapper.style.padding = "0";
           if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
             dropped.style.width = "100%";
             dropped.style.height = "100%";
             dropped.style.objectFit = "contain";
             dropped.style.display = "block";
-            dropped.style.margin = "0";
-            dropped.style.padding = "0";
             dropped.style.background = "none";
           }
         }
+
         if (category === "character") {
-          wrapper.style.right = "0";
+          // Bottom center
+          wrapper.style.left = "50%";
           wrapper.style.top = "70%";
-          wrapper.style.left = "30%";
-          wrapper.style.transform = "translateY(-50%) scale(0.6)";
-          wrapper.style.width = "48px";
-          wrapper.style.height = "62px";
+          wrapper.style.transform = "translate(-50%, -50%)";
           wrapper.style.zIndex = "2";
-          if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
-            dropped.style.width = "48px";
-            dropped.style.height = "62px";
-            dropped.style.objectFit = "contain";
-            dropped.style.display = "block";
-            dropped.style.margin = "0";
-            dropped.style.padding = "0";
-            dropped.style.background = "none";
-          }
+          // DO NOT set fixed px sizes; CSS handles .character-svg sizing responsively
         }
+
         if (category === "animal") {
+          // Upper-left corner
           wrapper.style.left = "5px";
           wrapper.style.top = "30px";
-          wrapper.style.width = "36px";
-          wrapper.style.height = "36px";
           wrapper.style.zIndex = "3";
-          if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
-            dropped.style.width = "36px";
-            dropped.style.height = "36px";
-            dropped.style.objectFit = "contain";
-            dropped.style.display = "block";
-            dropped.style.margin = "0";
-            dropped.style.padding = "0";
-            dropped.style.background = "none";
-          }
+          // DO NOT set fixed px sizes; CSS handles .animal sizing responsively
         }
-        box.appendChild(wrapper);
 
-        // Always update background after drop
+        box.appendChild(wrapper);
         updateDropBoxBackground(box);
 
-        // Enable dragging out (remove from box)
-        wrapper.addEventListener('dragstart', function(ev) {
-          wrapper.remove();
-          updateDropBoxBackground(box);
-        });
-        wrapper.addEventListener('click', function(ev) {
+        // Allow remove by dragging out / clicking
+        wrapper.addEventListener('dragstart', () => { wrapper.remove(); updateDropBoxBackground(box); });
+        wrapper.addEventListener('click', () => {
           if (wrapper.parentElement && wrapper.parentElement.classList.contains('drop-box')) {
-            wrapper.remove();
-            updateDropBoxBackground(box);
+            wrapper.remove(); updateDropBoxBackground(box);
           }
         });
       });
     });
 
-    // Touch drag-and-drop support for mobile
-    function isTouchDevice() {
-      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
+    // Touch drag-and-drop support (no fixed px sizes)
+    function isTouchDevice() { return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
     if (isTouchDevice()) {
-      let touchDragEl = null, touchCategory = '', touchHTML = '', touchOrigin = null;
+      let touchCategory = '', touchHTML = '';
       let ghost = null;
       document.querySelectorAll('.house, .character-svg, .animal').forEach(el => {
         el.addEventListener('touchstart', function(e) {
           if (e.touches.length > 1) return;
-          touchDragEl = el;
           touchCategory = getCategory(el);
           touchHTML = el.outerHTML;
-          touchOrigin = el.parentElement;
-          // Create ghost
+          // ghost preview
           ghost = el.cloneNode(true);
           ghost.style.position = 'fixed';
           ghost.style.pointerEvents = 'none';
           ghost.style.opacity = '0.7';
           ghost.style.zIndex = '9999';
-          ghost.style.left = e.touches[0].clientX - 24 + 'px';
-          ghost.style.top = e.touches[0].clientY - 24 + 'px';
-          ghost.style.width = getComputedStyle(el).width;
-          ghost.style.height = getComputedStyle(el).height;
+          const rect = el.getBoundingClientRect();
+          ghost.style.width = rect.width + 'px';
+          ghost.style.height = rect.height + 'px';
+          ghost.style.left = (e.touches[0].clientX - rect.width/2) + 'px';
+          ghost.style.top = (e.touches[0].clientY - rect.height/2) + 'px';
           document.body.appendChild(ghost);
           document.body.style.overflow = 'hidden';
         });
         el.addEventListener('touchmove', function(e) {
           if (!ghost) return;
-          ghost.style.left = e.touches[0].clientX - 24 + 'px';
-          ghost.style.top = e.touches[0].clientY - 24 + 'px';
+          const rect = ghost.getBoundingClientRect();
+          ghost.style.left = (e.touches[0].clientX - rect.width/2) + 'px';
+          ghost.style.top = (e.touches[0].clientY - rect.height/2) + 'px';
           e.preventDefault();
         });
         el.addEventListener('touchend', function(e) {
@@ -824,7 +517,8 @@
             // Remove previous of same category
             let prev = dropTarget.querySelector(`[data-category="${touchCategory}"]`);
             if (prev) prev.remove();
-            // Create wrapper
+
+            // Wrapper
             let wrapper = document.createElement('div');
             wrapper.dataset.category = touchCategory;
             wrapper.style.position = "absolute";
@@ -833,68 +527,37 @@
             wrapper.innerHTML = touchHTML;
             let dropped = wrapper.firstChild;
             dropped.setAttribute('draggable', 'true');
+
             if (touchCategory === "house") {
-              wrapper.style.left = "0";
-              wrapper.style.top = "0";
-              wrapper.style.width = "100%";
-              wrapper.style.height = "100%";
+              wrapper.style.left = "0"; wrapper.style.top = "0";
+              wrapper.style.width = "100%"; wrapper.style.height = "100%";
               wrapper.style.zIndex = "1";
-              wrapper.style.margin = "0";
-              wrapper.style.padding = "0";
               if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
                 dropped.style.width = "100%";
                 dropped.style.height = "100%";
                 dropped.style.objectFit = "contain";
                 dropped.style.display = "block";
-                dropped.style.margin = "0";
-                dropped.style.padding = "0";
                 dropped.style.background = "none";
               }
             }
             if (touchCategory === "character") {
-              wrapper.style.right = "0";
+              wrapper.style.left = "50%";
               wrapper.style.top = "70%";
-              wrapper.style.left = "30%";
-              wrapper.style.transform = "translateY(-50%) scale(0.6)";
-              wrapper.style.width = "48px";
-              wrapper.style.height = "62px";
+              wrapper.style.transform = "translate(-50%, -50%)";
               wrapper.style.zIndex = "2";
-              if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
-                dropped.style.width = "48px";
-                dropped.style.height = "62px";
-                dropped.style.objectFit = "contain";
-                dropped.style.display = "block";
-                dropped.style.margin = "0";
-                dropped.style.padding = "0";
-                dropped.style.background = "none";
-              }
             }
             if (touchCategory === "animal") {
-              wrapper.style.left = "0";
-              wrapper.style.top = "40px";
-              wrapper.style.width = "36px";
-              wrapper.style.height = "36px";
+              wrapper.style.left = "5px";
+              wrapper.style.top = "30px";
               wrapper.style.zIndex = "3";
-              if (dropped.tagName === "SVG" || dropped.tagName === "IMG") {
-                dropped.style.width = "36px";
-                dropped.style.height = "36px";
-                dropped.style.objectFit = "contain";
-                dropped.style.display = "block";
-                dropped.style.margin = "0";
-                dropped.style.padding = "0";
-                dropped.style.background = "none";
-              }
             }
+
             dropTarget.appendChild(wrapper);
             updateDropBoxBackground(dropTarget);
-            wrapper.addEventListener('touchstart', function(ev) {
-              wrapper.remove();
-              updateDropBoxBackground(dropTarget);
-            });
-            wrapper.addEventListener('click', function(ev) {
+            wrapper.addEventListener('touchstart', function() { wrapper.remove(); updateDropBoxBackground(dropTarget); });
+            wrapper.addEventListener('click', function() {
               if (wrapper.parentElement && wrapper.parentElement.classList.contains('drop-box')) {
-                wrapper.remove();
-                updateDropBoxBackground(dropTarget);
+                wrapper.remove(); updateDropBoxBackground(dropTarget);
               }
             });
           }
