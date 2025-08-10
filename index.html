@@ -2,56 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Game Entrance</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <style>
-    /* מיכל המשחק */
-    .game-card {
-      background: url('front_game.svg') no-repeat center center;
-      background-size: contain;
+    :root{
+      --ratio: 1224/668;  /* card aspect ratio (width / height) */
+      --pad: 1vmin;       /* very thin margin around card */
+      --scale: 1;         /* max possible size after padding */
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #fff;   /* margin color */
+      overflow: hidden;
+    }
+
+    /* Center container with minimal padding */
+    .stage {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(90vw, 1224px); /* מגביל מקסימום רוחב */
-      aspect-ratio: 1224 / 668; /* שומר יחס גובה-רוחב */
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      display: grid;
+      place-items: center;
+      padding: var(--pad);
     }
 
-    /* הכפתור */
+    /* Game card: fit perfectly without cropping */
+    .game-card {
+      width: calc(
+        min(
+          100%, 
+          calc((100dvh - 2*var(--pad)) * var(--ratio))
+        ) * var(--scale)
+      );
+      max-width: 1224px;
+      aspect-ratio: var(--ratio);
+      background: url('front_game.svg') no-repeat center center / contain;
+      position: relative;
+      container-type: size; /* enables cqw for proportional button sizing */
+    }
+
+    /* Button scales with the card */
     .svg-background-btn {
-      background: url('greenBotton.svg') no-repeat center center;
-      background-size: contain;
-      border: none;
-      width: 8.9%; /* אחוז מרוחב התמונה */
-      aspect-ratio: 3 / 1; /* יחס קבוע בין רוחב לגובה */
-      cursor: pointer;
-      position: absolute; /* יחסית ל-.game-card */
-      top: 54.8%;  /* מיקום אחוזי מהתמונה */
-      left: 59.63%; /* מיקום אחוזי מהתמונה */
+      position: absolute;
+      top: 54.8%;
+      left: 59.63%;
       transform: translate(-50%, -50%);
-      min-width: 50px;
+      border: 0;
+      background: url('greenBotton.svg') no-repeat center / contain;
+      aspect-ratio: 3 / 1;
+      width: 8.9cqw; /* proportional to card width */
+      cursor: pointer;
+      min-width: 28px;
     }
-
-    /* מוודא שהתמונה לא תחרוג מהמסך הקטן מאוד */
-    @media (max-height: 400px) {
-      .game-card {
-        height: 90vh;
-        width: auto;
-      }
+    @supports not (width: 1cqw) {
+      .svg-background-btn { width: 8.9%; }
     }
   </style>
 </head>
 <body>
-  <div class="game-card">
-    <button id="enter-btn" class="svg-background-btn"></button>
+  <div class="stage">
+    <div class="game-card">
+      <button id="enter-btn" class="svg-background-btn" aria-label="Enter"></button>
+    </div>
   </div>
+
   <script>
     document.getElementById('enter-btn').addEventListener('click', () => {
-      window.location.href = "game_one.html"; // מעבר למשחק
+      window.location.href = "game_one.html";
     });
   </script>
 </body>
