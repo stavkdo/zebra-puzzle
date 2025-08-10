@@ -5,64 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Game Entrance</title>
   <style>
-    :root {
-      --ratio: 1224/668;   /* aspect ratio of the card */
-      --pad: 0.5vmin;      /* ultra-thin white margin */
+    :root{
+      /* Your final SVG size (356×615) */
+      --ratio: 356 / 615;
+
+      /* Tiny margin so it doesn’t touch phone edges (adjust if you want) */
+      --pad: 1vmin;
+
+      /* Button position & size (percent of card) — tweak these if needed */
+      --btn-left: 80.5%;
+      --btn-top: 54.8%;
+      --btn-width: 17.8%;          /* ~ how wide the green button should look */
     }
 
     html, body {
       margin: 0;
       height: 100%;
-      background: #fff;    /* background margin color */
-      overflow: hidden;
+      background: #fff;
     }
 
+    /* Center the card and keep a thin margin */
     .stage {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100dvh;
+      display: grid;
+      place-items: center;
+      height: 100svh;              /* stable viewport height on mobile */
       padding: var(--pad);
+      box-sizing: border-box;
     }
 
-    .game-card {
-      /* Always fill nearly the whole width of the viewport */
-      width: calc(100vw - 2*var(--pad));
-      max-width: 1224px;
-      aspect-ratio: var(--ratio);
-      background: url('front_game.svg') no-repeat center / contain;
+    /* Card: biggest size that fits both width & height (no cropping) */
+    .card {
       position: relative;
-      container-type: size; /* enables cqw for proportional children */
+      aspect-ratio: var(--ratio);
+      width: min(
+        calc(100vw - 2*var(--pad)),                  /* width limit */
+        calc((100svh - 2*var(--pad)) * var(--ratio)) /* height-based width */
+      );
+      max-width: 1224px; /* optional desktop cap; remove if not needed */
     }
 
-    /* Button stays proportional to the card */
-    .svg-background-btn {
-      position: absolute;
-      top: 54.8%;
-      left: 59.63%;
-      transform: translate(-50%, -50%);
-      border: none;
-      background: url('greenBotton.svg') no-repeat center / contain;
-      aspect-ratio: 3 / 1;
-      width: 8.9cqw; /* 8.9% of the card's width */
-      cursor: pointer;
-      min-width: 28px;
+    /* Front image fills the card */
+    .card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* show entire SVG */
+      pointer-events: none; /* so taps hit the button */
     }
-    @supports not (width: 1cqw) {
-      .svg-background-btn { width: 8.9%; }
+
+    /* Green button: positioned over the card by percentages */
+    .enter-btn {
+      position: absolute;
+      left: var(--btn-left);
+      top: var(--btn-top);
+      transform: translate(-50%, -50%);
+      width: var(--btn-width);
+      aspect-ratio: 64 / 33;           /* your button SVG ratio */
+      border: 0;
+      background: url('greenBotton.svg') no-repeat center / contain;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="stage">
-    <div class="game-card">
-      <button id="enter-btn" class="svg-background-btn"></button>
+    <div class="card">
+      <img src="front_game.svg" alt="Game card" />
+      <button class="enter-btn" aria-label="Enter"></button>
     </div>
   </div>
 
   <script>
-    document.getElementById('enter-btn').addEventListener('click', () => {
-      window.location.href = "game_one.html";
+    // Go to the game when the button is pressed
+    document.querySelector('.enter-btn').addEventListener('click', () => {
+      window.location.href = 'game_one.html';
     });
   </script>
 </body>
