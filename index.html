@@ -4,55 +4,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Game Entrance</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <style>
-    :root{
-      --ratio: 1224/668;  /* card aspect ratio (width / height) */
-      --pad: 1vmin;       /* very thin margin around card */
-      --scale: 1;         /* max possible size after padding */
+    :root {
+      --ratio: 1224/668;   /* aspect ratio of the card */
+      --pad: 0.5vmin;      /* ultra-thin white margin */
     }
 
     html, body {
       margin: 0;
       height: 100%;
-      background: #fff;   /* margin color */
+      background: #fff;    /* background margin color */
       overflow: hidden;
     }
 
-    /* Center container with minimal padding */
     .stage {
-      position: fixed;
-      inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      display: grid;
-      place-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100dvh;
       padding: var(--pad);
     }
 
-    /* Game card: fit perfectly without cropping */
     .game-card {
-      width: calc(
-        min(
-          100%, 
-          calc((100dvh - 2*var(--pad)) * var(--ratio))
-        ) * var(--scale)
-      );
+      /* Always fill nearly the whole width of the viewport */
+      width: calc(100vw - 2*var(--pad));
       max-width: 1224px;
       aspect-ratio: var(--ratio);
-      background: url('front_game.svg') no-repeat center center / contain;
+      background: url('front_game.svg') no-repeat center / contain;
       position: relative;
-      container-type: size; /* enables cqw for proportional button sizing */
+      container-type: size; /* enables cqw for proportional children */
     }
 
-    /* Button scales with the card */
+    /* Button stays proportional to the card */
     .svg-background-btn {
       position: absolute;
       top: 54.8%;
       left: 59.63%;
       transform: translate(-50%, -50%);
-      border: 0;
+      border: none;
       background: url('greenBotton.svg') no-repeat center / contain;
       aspect-ratio: 3 / 1;
-      width: 8.9cqw; /* proportional to card width */
+      width: 8.9cqw; /* 8.9% of the card's width */
       cursor: pointer;
       min-width: 28px;
     }
@@ -64,7 +56,7 @@
 <body>
   <div class="stage">
     <div class="game-card">
-      <button id="enter-btn" class="svg-background-btn" aria-label="Enter"></button>
+      <button id="enter-btn" class="svg-background-btn"></button>
     </div>
   </div>
 
