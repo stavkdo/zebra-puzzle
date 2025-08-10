@@ -6,49 +6,43 @@
   <title>Game Entrance</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <style>
- /* מיכל המשחק */
-.game-card {
-  background: url('front_game.svg') no-repeat center center;
-  background-size: contain;
+    /* מיכל המשחק */
+    .game-card {
+      background: url('front_game.svg') no-repeat center center;
+      background-size: contain;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(90vw, 1224px); /* מגביל מקסימום רוחב */
+      aspect-ratio: 1224 / 668; /* שומר יחס גובה-רוחב */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    /* הכפתור */
+    .svg-background-btn {
+      background: url('greenBotton.svg') no-repeat center center;
+      background-size: contain;
+      border: none;
+      width: 8.9%; /* אחוז מרוחב התמונה */
+      aspect-ratio: 3 / 1; /* יחס קבוע בין רוחב לגובה */
+      cursor: pointer;
+      position: absolute; /* יחסית ל-.game-card */
+      top: 54.8%;  /* מיקום אחוזי מהתמונה */
+      left: 59.63%; /* מיקום אחוזי מהתמונה */
+      transform: translate(-50%, -50%);
+      min-width: 50px;
+    }
 
-  width: min(90vw, 1224px);  /* רוחב עד 90% מהמסך או מקסימום 1224px */
-  aspect-ratio: 1224 / 668;  /* שומר יחס גובה-רוחב */
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* הכפתור */
-.svg-background-btn {
-  background: url('greenBotton.svg') no-repeat center center;
-  background-size: contain;
-  border: none;
-
-  width: 8.9%;               /* אחוז מרוחב התמונה */
-  aspect-ratio: 3 / 1;       /* יחס רוחב-גובה */
-  min-width: 50px;           /* מינימום רוחב לכפתור, למכשירים קטנים */
-
-  cursor: pointer;
-  position: absolute;        /* ממוקם יחסית ל-.game-card */
-  top: 54.8%;                /* אחוז מהגובה של מיכל המשחק */
-  left: 59.63%;              /* אחוז מהרוחב של מיכל המשחק */
-  transform: translate(-50%, -50%);
-}
-
-/* טיפול במסכים עם גובה נמוך במיוחד */
-@media (max-height: 400px) {
-  .game-card {
-    height: 90vh;   /* גובה עד 90% מגובה המסך */
-    width: auto;    /* רוחב אוטומטי לפי הגובה וaspect-ratio */
-  }
-}
-
+    /* מוודא שהתמונה לא תחרוג מהמסך הקטן מאוד */
+    @media (max-height: 400px) {
+      .game-card {
+        height: 90vh;
+        width: auto;
+      }
+    }
   </style>
 </head>
 <body>
