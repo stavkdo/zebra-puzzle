@@ -1,59 +1,49 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-<link rel="icon" href="favicon.svg" type="image/svg+xml" />
-<style>
-.svg-background-btn {
-  background: url('greenBotton.svg') no-repeat center center;
-  background-size: contain;
-  border: none;
-  width: 7.2vw;
-  max-width: 200px;
-  aspect-ratio: 3 / 1;
-  cursor: pointer;
-
-  position: absolute;
-  top: 54.8%;
-  left: 58.315%;
-  transform: translate(-50%, -50%);
-}
-
-.game-card {
-  background: url('front_game.svg') no-repeat center center;
-  background-size: contain; /* fill the entire area */
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  width: 97vw;
-  height: 97vh;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-@media (max-width: 700px) {
-    .game-card {
-    width: 100vw;
-    height: 100vh;
-    background-size: contain;
-  }
-
-  .svg-background-btn {
-    width: 26vw;        
-    top: 53.8%;
-    left: 80.28%;
-  }
-    }
-
- </style>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Game Entrance</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <style>
+    /* מיכל המשחק */
+    .game-card {
+      background: url('front_game.svg') no-repeat center center;
+      background-size: contain;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(90vw, 1224px); /* מגביל מקסימום רוחב */
+      aspect-ratio: 1224 / 668; /* שומר יחס גובה-רוחב */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* הכפתור */
+    .svg-background-btn {
+      background: url('greenBotton.svg') no-repeat center center;
+      background-size: contain;
+      border: none;
+      width: 8.9%; /* אחוז מרוחב התמונה */
+      aspect-ratio: 3 / 1; /* יחס קבוע בין רוחב לגובה */
+      cursor: pointer;
+      position: absolute; /* יחסית ל-.game-card */
+      top: 54.8%;  /* מיקום אחוזי מהתמונה */
+      left: 59.63%; /* מיקום אחוזי מהתמונה */
+      transform: translate(-50%, -50%);
+      min-width: 50px;
+    }
+
+    /* מוודא שהתמונה לא תחרוג מהמסך הקטן מאוד */
+    @media (max-height: 400px) {
+      .game-card {
+        height: 90vh;
+        width: auto;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="game-card">
@@ -61,7 +51,7 @@
   </div>
   <script>
     document.getElementById('enter-btn').addEventListener('click', () => {
-      window.location.href = "game_one.html"; // redirect to the actual game
+      window.location.href = "game_one.html"; // מעבר למשחק
     });
   </script>
 </body>
