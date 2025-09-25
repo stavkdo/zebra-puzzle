@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Lights Out Game</title>
+  <link rel="icon" href="faviconLO.svg" type="image/svg+xml" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Montserrat', system-ui, sans-serif;
+      background: #f6f8fa;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .game-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1.5px solid #e0e0e0;
+      padding: 24px 16px 20px 16px;
+      max-width: 420px;
+      width: 98vw;
+      height: 98vh;
+      margin: 4px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .game-header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .timer-badge, .error-badge {
+      background: #f0f2f5;
+      color: #222;
+      font-weight: 600;
+      font-size: 0.60rem;
+      border-radius: 999px;
+      padding: 3px 10px;
+      min-width: 45px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      border: 1px solid #e0e0e0;
+    }
+    .error-badge {
+      color: #222;
+      background: #fbe9e7;
+      border: 1px solid #ffcdd2;
+    }
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: #222;
+    }
+    .header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+      margin: 1.5rem 0 2rem 0;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    #controls {
+      margin-bottom: 1.2rem;
+      background: #fffde7;
+      border-radius: 12px;
+      padding: 0.7rem 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      display: inline-block;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+    }
+    #controls label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    #controls select {
+      margin-right: 0.5rem;
+      padding: 0.4rem;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    #controls button {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: 1px solid #4CAF50;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #controls button:hover {
+      background: #45a049;
+    }
+    .grid {
+      display: grid;
+      gap: 4px;
+      justify-content: center;
+      align-items: center;
+      background: #fffde7;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .cell {
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: box-shadow 0.2s, background 0.2s;
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .cell:active, .cell.effect {
+      animation: bulbEffect 0.3s;
+      background: #fffde7;
+    }
+    @keyframes bulbEffect {
+      0% { box-shadow: 0 0 0 0 #ffffff; }
+      50% { box-shadow: 0 0 24px 8px #fef8e7; }
+      100% { box-shadow: 0 0 0 0 #fef8e7; }
+    }
+    .cell img {
+      width: 70px;
+      height: 70px;
+      transition: filter 0.2s;
+    }
+    .cell.on img {
+      filter: drop-shadow(0 0 16px #ffff00) brightness(1.2);
+    }
+    
+    /* Responsive scaling for all devices */
+    @media (max-width: 480px) {
+      .cell {
+        width: 50px;
+        height: 50px;
+      }
+      .cell img {
+        width: 45px;
+        height: 45px;
+      }
+      .grid {
+        gap: 3px;
+        padding: 8px;
+      }
+      #controls {
+        padding: 0.6rem 1rem;
+        max-width: 280px;
+      }
+      #controls select, #controls button {
+        font-size: 0.9rem;
+        padding: 0.35rem;
+      }
+      #controls button {
+        padding: 0.35rem 0.6rem;
+      }
+    }
+    
+    @media (min-width: 481px) and (max-width: 768px) {
+      .cell {
+        width: 65px;
+        height: 65px;
+      }
+      .cell img {
+        width: 58px;
+        height: 58px;
+      }
+      .grid {
+        gap: 4px;
+        padding: 10px;
+      }
+      #controls {
+        max-width: 320px;
+      }
+    }
+    
+    @media (max-height: 600px) {
+      .game-card {
+        height: 96vh;
+        padding: 16px 12px 12px 12px;
+      }
+      .header {
+        margin: 1rem 0 1.2rem 0;
+        font-size: 1.3rem;
+      }
+      #controls {
+        margin-bottom: 1rem;
+        padding: 0.6rem 1rem;
+        max-width: 300px;
+      }
+      #controls select, #controls button {
+        font-size: 0.9rem;
+        padding: 0.3rem;
+      }
+      #controls button {
+        padding: 0.3rem 0.6rem;
+      }
+      .cell {
+        width: 60px;
+        height: 60px;
+      }
+      .cell img {
+        width: 55px;
+        height: 55px;
+      }
+      .grid {
+        gap: 3px;
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-card">
+    
+    <div class="game-header-bar">
+      <span class="timer-badge" id="timer">0</span>
+      <span class="error-badge" id="moves">0 moves</span>
+    </div>
+    
+    <div class="header"><strong>Light's Out</strong></div>
+
+    <div id="controls">
+      <label for="difficulty">Choose difficulty: </label>
+      <select id="difficulty">
+        <option value="3">Easy (3x3)</option>
+        <option value="4">Medium (4x4)</option>
+        <option value="5">Hard (5x5)</option>
+        <option value="cross">Special (Cross)</option>
+      </select>
+      <button onclick="startGame()">Start Game</button>
+    </div>
+    <div class="message" id="messageBox"></div>
+    <div id="game" class="grid"></div>
+  </div>
+  <script>
+    let gridSize = 3;
+    let grid = [];
+    let timerInterval = null;
+    let startTime = null;
+    let moves = 0;
+    const messageBox = document.getElementById('messageBox');
+
+    function createGrid(size) {
+      const container = document.getElementById("game");
+      container.innerHTML = "";
+      
+      if (size === "cross") {
+        createCrossGrid();
+        return;
+      }
+      
+      container.style.gridTemplateColumns = `repeat(${size}, auto)`;
+      grid = Array(size).fill(null).map(() => Array(size).fill(false));
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          cell.innerHTML = getCellSVG(false);
+          cell.addEventListener("click", () => {
+            toggle(row, col);
+            moves++;
+            showMoves();
+            cell.classList.add("effect");
+            setTimeout(() => cell.classList.remove("effect"), 300);
+          });
+          container.appendChild(cell);
+        }
+      }
+    }
+
+    function createCrossGrid() {
+      const container = document.getElementById("game");
+      container.innerHTML = "";
+      container.style.gridTemplateColumns = "repeat(5, auto)";
+      
+      // Create a 5x5 grid but only show cells in cross pattern
+      grid = Array(5).fill(null).map(() => Array(5).fill(false));
+      const crossPositions = [
+        [0,2], [1,1], [1,2], [1,3], [2,0], [2,1], [2,2], [2,3], [2,4], [3,1], [3,2], [3,3], [4,2]
+      ];
+      
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          
+          // Check if this position should be visible in cross pattern
+          const isVisible = crossPositions.some(pos => pos[0] === row && pos[1] === col);
+          
+          if (isVisible) {
+            cell.innerHTML = getCellSVG(false);
+            cell.style.visibility = "visible";
+            cell.addEventListener("click", () => {
+              toggleCross(row, col);
+              moves++;
+              showMoves();
+              cell.classList.add("effect");
+              setTimeout(() => cell.classList.remove("effect"), 300);
+            });
+          } else {
+            cell.innerHTML = "";
+            cell.style.visibility = "hidden";
+            cell.style.pointerEvents = "none";
+          }
+          
+          container.appendChild(cell);
+        }
+      }
+    }
+
+    function getCellSVG(isOn) {
+      if (isOn) {
+        return `<img src="lightbulb_on.svg" alt="On">`;
+      } else {
+        return `<img src="lightbulb_off.svg" alt="Off">`;
+      }
+    }
+
+    function toggle(r, c) {
+      const dirs = [
+        [0, 0],
+        [0, 1],
+        [0, -1],
+        [1, 0],
+        [-1, 0],
+      ];
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize) {
+          grid[nr][nc] = !grid[nr][nc];
+        }
+      }
+      updateGrid();
+    }
+
+    function toggleCross(r, c) {
+      const dirs = [
+        [0, 0],
+        [0, 1],
+        [0, -1],
+        [1, 0],
+        [-1, 0],
+      ];
+      const crossPositions = [
+        [0,2], [1,1], [1,2], [1,3], [2,0], [2,1], [2,2], [2,3], [2,4], [3,1], [3,2], [3,3], [4,2]
+      ];
+      
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5) {
+          const isInCross = crossPositions.some(pos => pos[0] === nr && pos[1] === nc);
+          if (isInCross) {
+            grid[nr][nc] = !grid[nr][nc];
+          }
+        }
+      }
+      updateCrossGrid();
+    }
+
+    function showTimer(seconds) {
+      let timerDiv = document.getElementById("timer");
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      timerDiv.textContent = `${mins}:${secs}`;
+    }
+
+    function showMoves() {
+      let movesDiv = document.getElementById("moves");
+      movesDiv.textContent = `Moves: ${moves}`;
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      showTimer(0);
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        showTimer(seconds);
+      }, 500);
+    }
+
+    function stopTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function checkWin() {
+      const allOn = grid.flat().every(cell => cell === true);
+      const allOff = grid.flat().every(cell => cell === false);
+      if (allOn || allOff) {
+        stopTimer();
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        messageBox.textContent = `You solved the puzzle in ${mins}:${secs} and ${moves+1} moves!`;
+      } else {
+        messageBox.textContent = "";
+      }
+    }
+
+    function checkCrossWin() {
+      const crossPositions = [
+        [0,2], [1,1], [1,2], [1,3], [2,0], [2,1], [2,2], [2,3], [2,4], [3,1], [3,2], [3,3], [4,2]
+      ];
+      
+      const crossCells = crossPositions.map(pos => grid[pos[0]][pos[1]]);
+      const allOn = crossCells.every(cell => cell === true);
+      const allOff = crossCells.every(cell => cell === false);
+      
+      if (allOn || allOff) {
+        stopTimer();
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        messageBox.textContent = `You solved the cross puzzle in ${mins}:${secs} and ${moves+1} moves!`;
+      } else {
+        messageBox.textContent = "";
+      }
+    }
+
+    function updateGrid() {
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        cell.classList.toggle("on", grid[row][col]);
+        cell.innerHTML = getCellSVG(grid[row][col]);
+      });
+      checkWin();
+    }
+
+    function updateCrossGrid() {
+      const crossPositions = [
+        [0,2], [1,1], [1,2], [1,3], [2,0], [2,1], [2,2], [2,3], [2,4], [3,1], [3,2], [3,3], [4,2]
+      ];
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach(cell => {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        const isInCross = crossPositions.some(pos => pos[0] === row && pos[1] === col);
+        
+        if (isInCross) {
+          cell.classList.toggle("on", grid[row][col]);
+          cell.innerHTML = getCellSVG(grid[row][col]);
+        }
+      });
+      checkCrossWin();
+    }
+
+    function scrambleGrid(moves = 10) {
+      if (gridSize === "cross") {
+        scrambleCrossGrid(moves);
+        return;
+      }
+      
+      for (let i = 0; i < moves; i++) {
+        const r = Math.floor(Math.random() * gridSize);
+        const c = Math.floor(Math.random() * gridSize);
+        toggle(r, c);
+      }
+    }
+
+    function scrambleCrossGrid(moves = 15) {
+      const crossPositions = [
+        [0,2], [1,1], [1,2], [1,3], [2,0], [2,1], [2,2], [2,3], [2,4], [3,1], [3,2], [3,3], [4,2]
+      ];
+      
+      for (let i = 0; i < moves; i++) {
+        const randomPos = crossPositions[Math.floor(Math.random() * crossPositions.length)];
+        toggleCross(randomPos[0], randomPos[1]);
+      }
+    }
+
+    function startGame() {
+      const difficulty = document.getElementById("difficulty").value;
+      gridSize = difficulty === "cross" ? "cross" : parseInt(difficulty);
+      moves = 0;
+      showMoves();
+      createGrid(gridSize);
+      if (gridSize === "cross") {
+        scrambleGrid(15);
+      } else {
+        scrambleGrid(gridSize * 2);
+      }
+      startTimer();
+    }
+
+    startGame();
+  </script>
+</body>
+</html>

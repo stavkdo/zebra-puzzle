@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <link rel="icon" href="mainFavicon.svg" type="image/svg+xml" />
   <title>Game Entrance</title>
   <style>
     :root{
@@ -15,6 +16,8 @@
       /* Button position & size (percent of card) — tweak these if needed */
       --btn-left: 80.5%;
       --btn-top: 54.8%;
+      --btn1-left: 80.5%;
+      --btn1-top: 83.3%;
       --btn-width: 17.8%;          /* ~ how wide the green button should look */
     }
 
@@ -65,20 +68,37 @@
       background: url('greenButton.svg') no-repeat center / contain;
       cursor: pointer;
     }
+
+    /* Alternative button styles */
+    .alt-btn {
+      position: absolute;
+      left: var(--btn1-left);
+      top: var(--btn1-top);
+      transform: translate(-50%, -50%);
+      width: var(--btn-width);
+      aspect-ratio: 64 / 33;           /* your button SVG ratio */
+      border: 0;
+      background: url('yellowButton.svg') no-repeat center / contain;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="stage">
     <div class="card">
-      <img src="front_game.svg" alt="Game card" />
+      <img src="Group32.png" alt="Game card" />
       <button class="enter-btn" aria-label="Enter"></button>
+      <button class="enter-btn alt-btn" aria-label="Enter alt"></button>
     </div>
   </div>
 
   <script>
     // Go to the game when the button is pressed
-    document.querySelector('.enter-btn').addEventListener('click', () => {
+    document.querySelector('.enter-btn:not(.alt-btn)').addEventListener('click', () => {
       window.location.href = 'game_one.html';
+    });
+    document.querySelector('.alt-btn').addEventListener('click', () => {
+      window.location.href = 'game_two.html'; // Change this to your second game URL
     });
   </script>
 </body>
