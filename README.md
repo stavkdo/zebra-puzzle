@@ -30,6 +30,7 @@ No frameworks, no libraries — just clean, responsive code. <img src="pink.svg"
 ### <img src="white.svg" alt="Character 1" width="20"/> Author
 
 **Stav Kdoshim** <img src="mainFavicon.svg" alt="main" width="20"/>
+
 📧 stavkd04@gmail.com  
 🔗 [LinkedIn](https://www.linkedin.com/in/stav-kdoshim/)
 
